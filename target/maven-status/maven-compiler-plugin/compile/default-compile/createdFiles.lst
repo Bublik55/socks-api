@@ -1,0 +1,4 @@
+App.class
+controller\SockController.class
+model\Sock.class
+repository\SockRepository.class
