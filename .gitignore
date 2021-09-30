@@ -1,5 +1,7 @@
+/.idea
+/.settings
+/.target
 # Compiled class file
-.idea
 *.class
 
 # Log file
