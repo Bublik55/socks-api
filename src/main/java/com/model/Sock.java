@@ -1,6 +1,8 @@
 package com.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+
 
 @Entity
 @Table(name = "socks")
@@ -10,11 +12,13 @@ public class Sock {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
 
+  @NotBlank
   @Column(name = "color")
   private String color;
 
   @Column(name = "quantity")
   private int quantity;
+
 
   @Column(name = "cotton_part")
   private int cottonPart;
