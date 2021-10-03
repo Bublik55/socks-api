@@ -7,8 +7,9 @@ import java.util.Set;
 @Entity
 @Table(name = "colors")
 public class Color {
+    @Column(nullable = false)
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(name = "color")

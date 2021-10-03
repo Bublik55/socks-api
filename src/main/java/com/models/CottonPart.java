@@ -6,6 +6,7 @@ import java.util.Set;
 @Entity
 @Table(name = "cotton_parts")
 public class CottonPart {
+    @Column(nullable = false)
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;

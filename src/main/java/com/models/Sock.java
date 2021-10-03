@@ -1,7 +1,6 @@
 package com.models;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 
@@ -9,6 +8,7 @@ import java.io.Serializable;
 @Table(name = "socks")
 public class Sock implements Serializable {
 
+  @Column(nullable = false)
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
