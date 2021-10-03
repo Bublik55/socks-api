@@ -1,6 +1,10 @@
 package com.controller;
 
-import com.model.Sock;
+import com.models.Color;
+import com.models.CottonPart;
+import com.models.Sock;
+import com.repository.ColorRepository;
+import com.repository.CottonPartRepository;
 import com.repository.SockRepository;
 
 import java.util.ArrayList;
@@ -16,14 +20,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpServerErrorException;
 
 @RestController
 @Validated
@@ -32,30 +35,34 @@ public class SockController {
 
   @Autowired
   SockRepository sockRepository;
+  @Autowired
+  CottonPartRepository cottonPartRepository;
+  @Autowired
+  ColorRepository colorRepository;
 
   @GetMapping()
-  ResponseEntity<String> getByCondition(@RequestParam @NotBlank String color,
+  ResponseEntity<String> getByCondition(@RequestParam @NotBlank String strColor,
       @RequestParam @Min(0) @Max(100) int cotton_part, @RequestParam @NotBlank String operation) {
     try {
-      color = color.trim();
+      strColor = strColor.trim();
       List<Sock> socks = new ArrayList<Sock>();
       switch (operation) {
         case ("equal"):
-          this.sockRepository.findByColorAndCottonPartEquals(color, cotton_part).forEach(socks::add);
+          this.sockRepository.findByColorAndCottonPartEquals(strColor, cotton_part).forEach(socks::add);
           break;
         case ("moreThan"):
-          this.sockRepository.findByColorAndCottonPartGreaterThan(color, cotton_part).forEach(socks::add);
+          this.sockRepository.findByColorAndCottonPartGreaterThan(strColor, cotton_part).forEach(socks::add);
           break;
         case ("lessThan"):
-          this.sockRepository.findByColorAndCottonPartLessThan(color, cotton_part).forEach(socks::add);
+          this.sockRepository.findByColorAndCottonPartLessThan(strColor, cotton_part).forEach(socks::add);
           break;
         default:
-          return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+          return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
       }
       if (socks.isEmpty())
         return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-        final Integer toreturn = socks.stream().mapToInt(Sock::getQuantity).sum();
-      return new ResponseEntity<>(Integer.toString(toreturn), HttpStatus.OK);
+      final int torturing = socks.stream().mapToInt(Sock::getQuantity).sum();
+      return new ResponseEntity<>(Integer.toString(torturing), HttpStatus.OK);
     } catch (Exception e) {
       return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -65,39 +72,62 @@ public class SockController {
   @PostMapping("/income")
   ResponseEntity<Sock> income(@RequestParam @NotBlank String color, @RequestParam @Min(0) @Max(100) int cotton_part,
       @RequestParam @Min(1) int quantity) {
-    color = color.trim();
-    Optional<Sock> sockData = this.sockRepository.findOneByColorAndCottonPart(color, cotton_part);
-    if (sockData.isPresent()) {
-      Sock _sock = sockData.get();
-      _sock.incomeSocks(quantity);
-      return new ResponseEntity<>(this.sockRepository.save(_sock), HttpStatus.OK);
+    ResponseEntity re;
+    Color oColor = findColorOrSave(color);
+    CottonPart cottonPart = findCottonPartOrSave(cotton_part);
+    Optional<Sock> Sock = this.sockRepository.findOneByColorAndCottonPart(oColor, cottonPart);
+    if (Sock.isPresent()) {
+      Sock.get().incomeSocks(quantity);
+      this.sockRepository.saveAndFlush(Sock.get());
+      re = new ResponseEntity<>(null, HttpStatus.OK);
     } else {
-      Sock _sock = new Sock(color, quantity, cotton_part);
-      return new ResponseEntity<>(this.sockRepository.save(_sock), HttpStatus.OK);
+      this.sockRepository.saveAndFlush(new Sock(oColor, quantity, cottonPart));
+      re = new ResponseEntity<>(null, HttpStatus.OK);
     }
+    return re;
   }
 
   @Validated
   @PostMapping("/outcome")
   ResponseEntity<Sock> outcome(@RequestParam @NotBlank String color, @RequestParam @Min(0) @Max(100) int cotton_part,
       @RequestParam @Min(1) int quantity) {
-    color = color.trim();
-
-    Optional<Sock> sockData = this.sockRepository.findOneByColorAndCottonPart(color, cotton_part);
+    ResponseEntity re;
+    Color oColor = findColorOrSave(color);
+    CottonPart cottonPart = findCottonPartOrSave(cotton_part);
+    Optional<Sock> sockData = this.sockRepository.findOneByColorAndCottonPart(oColor, cottonPart);
     if (sockData.isPresent()) {
       Sock _sock = sockData.get();
       _sock.outcomeSocks(quantity);
-      if (_sock.getQuantity() < 0)
-        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-      return new ResponseEntity<>(this.sockRepository.save(_sock), HttpStatus.OK);
+      re = new ResponseEntity<>(null, HttpStatus.OK);
     } else {
-      return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+      re = new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
+    return re;
   }
 
   @ExceptionHandler({ ConstraintViolationException.class })
-  public ResponseEntity<Object> handleException(Exception exc) {
-    return new ResponseEntity<>(exc, HttpStatus.BAD_REQUEST);
+  public ResponseEntity<Object> handleValidateException(Exception exc) {
+    return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler({ HttpServerErrorException.InternalServerError.class })
+  public ResponseEntity<Object> handleInternalServerException(Exception exc) {
+    return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  private Color findColorOrSave(String color) {
+    color = color.trim();
+    Optional<Color> colorToDb =this.colorRepository.findOneByColor(color);
+    if(colorToDb.isEmpty())
+      return this.colorRepository.save(new Color(color));
+    else return colorToDb.get();
+  }
+
+  private CottonPart findCottonPartOrSave(int cottonPart) {
+    Optional<CottonPart> cpToDb = this.cottonPartRepository.findOneByCottonPart(cottonPart);
+    if(cpToDb.isEmpty())
+      return this.cottonPartRepository.save(new CottonPart(cottonPart));
+    else return cpToDb.get();
   }
 
 }
