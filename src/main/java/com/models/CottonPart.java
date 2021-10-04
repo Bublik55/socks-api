@@ -8,7 +8,8 @@ import java.util.Set;
 public class CottonPart {
     @Column(nullable = false)
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "composite_generator")
+    @SequenceGenerator(name = "composite_generator", sequenceName = "composite_seq", allocationSize = 1)
     private long id;
 
     @Column(name = "cotton_part")

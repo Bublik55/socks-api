@@ -10,7 +10,8 @@ public class Sock implements Serializable {
 
   @Column(nullable = false)
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sock_generator")
+  @SequenceGenerator(name = "sock_generator", sequenceName = "sock_seq", allocationSize = 1)
   private long id;
 
   @ManyToOne(cascade = CascadeType.ALL, optional = false)

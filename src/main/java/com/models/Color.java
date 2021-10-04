@@ -9,7 +9,8 @@ import java.util.Set;
 public class Color {
     @Column(nullable = false)
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "color_generator")
+    @SequenceGenerator(name = "color_generator", sequenceName = "color_seq", allocationSize = 1)
     private long id;
 
     @Column(name = "color")
