@@ -34,14 +34,14 @@ public class SockController {
     @Autowired
     ColorRepository colorRepository;
 
-    SockService sockService;
-
+    final SockService sockService;
+    @Autowired
     public SockController(SockService sockService) {
         this.sockService = sockService;
     }
 
     @GetMapping()
-    ResponseEntity countByCondition(
+    ResponseEntity<String> countByCondition(
             @RequestParam @NotBlank String color,
             @RequestParam @Min(0) @Max(100) int cotton_part,
             @RequestParam @NotBlank String operation
@@ -52,7 +52,9 @@ public class SockController {
             case ("equal") -> res = this.sockRepository.findByColorAndCottonPartEquals(color, cotton_part);
             case ("moreThan") -> res = this.sockRepository.findByColorAndCottonPartGreaterThan(color, cotton_part);
             case ("lessThan") -> res = this.sockRepository.findByColorAndCottonPartLessThan(color, cotton_part);
-            default -> res = 0;
+            default -> {
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST) ;
+            }
         }
         if (res == null) res = 0;
         return new ResponseEntity<>(res.toString(), HttpStatus.OK);
@@ -60,7 +62,7 @@ public class SockController {
 
     @Validated
     @PostMapping("/income")
-    ResponseEntity income(@RequestBody @Valid SocksIncomeOutcomeDto dto) {
+    ResponseEntity<Object> income(@RequestBody @Valid SocksIncomeOutcomeDto dto) {
         boolean res;
         res = this.sockService.income(dto);
         if (res) {
@@ -72,7 +74,7 @@ public class SockController {
 //Если quantity в запросе на списание больше, чем в значение в БД, то является ли запрос BadRequest?
     @Validated
     @PostMapping("/outcome")
-    ResponseEntity outcome(@RequestBody  @Valid SocksIncomeOutcomeDto dto) {
+    ResponseEntity<Object> outcome(@RequestBody  @Valid SocksIncomeOutcomeDto dto) {
         boolean res;
         res = this.sockService.outcome(dto);
         if (res) {

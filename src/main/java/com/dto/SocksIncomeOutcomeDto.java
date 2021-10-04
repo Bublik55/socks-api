@@ -1,7 +1,5 @@
 package com.dto;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Required;
-import org.springframework.format.annotation.NumberFormat;
 
 import javax.validation.constraints.*;
 

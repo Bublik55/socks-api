@@ -37,7 +37,7 @@ public class SockService {
     }
 
     public boolean income(SocksIncomeOutcomeDto dto) {
-        Optional<Sock> Sock = null;
+        Optional<Sock> Sock;
         Optional<Color>  color =this.colorRepository.findOneByColor(dto.getColor());
         Optional<CottonPart> cottonPart = this.cottonPartRepository.findOneByCottonPart(dto.getCottonPart());
         if (color.isPresent() && cottonPart.isPresent()) {
@@ -63,7 +63,7 @@ public class SockService {
     }
 
     public boolean outcome(SocksIncomeOutcomeDto dto) {
-        Optional<Sock> Sock = null;
+        Optional<Sock> Sock;
         Optional<Color>  color =this.colorRepository.findOneByColor(dto.getColor());
         Optional<CottonPart> cottonPart = this.cottonPartRepository.findOneByCottonPart(dto.getCottonPart());
         if (color.isPresent() && cottonPart.isPresent()) {
