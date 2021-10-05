@@ -14,6 +14,7 @@ import javax.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,7 @@ public class SockController {
     SockRepository sockRepository;
 
     final SockService sockService;
+
     @Autowired
     public SockController(SockService sockService) {
         this.sockService = sockService;
@@ -47,47 +49,43 @@ public class SockController {
             case ("moreThan") -> res = this.sockRepository.findByColorAndCottonPartGreaterThan(color, cotton_part);
             case ("lessThan") -> res = this.sockRepository.findByColorAndCottonPartLessThan(color, cotton_part);
             default -> {
-                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST) ;
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             }
         }
         if (res == null) res = 0;
         return new ResponseEntity<>(res.toString(), HttpStatus.OK);
     }
 
-    @Validated
     @PostMapping("/income")
     ResponseEntity<Object> income(@RequestBody @Valid SocksIncomeOutcomeDto dto) {
-        boolean res;
-        res = this.sockService.income(dto);
-        if (res) {
-            return new ResponseEntity<>(null, HttpStatus.OK);
-        } else {
-            return new ResponseEntity(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        this.sockService.income(dto);
+        return new ResponseEntity<>("Удалось  добавить приход", HttpStatus.OK);
     }
-//Если quantity в запросе на списание больше, чем в значение в БД, то является ли запрос BadRequest?
-    @Validated
+
+    //Если quantity в запросе на списание больше, чем в значение в БД, то является ли запрос BadRequest?
     @PostMapping("/outcome")
-    ResponseEntity<Object> outcome(@RequestBody  @Valid SocksIncomeOutcomeDto dto) {
+    ResponseEntity<Object> outcome(@RequestBody @Valid SocksIncomeOutcomeDto dto) {
         boolean res;
         res = this.sockService.outcome(dto);
-        if (res) {
-            return new ResponseEntity<>(null, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        if (res)
+            return new ResponseEntity<>("Удалось учесть расход", HttpStatus.OK);
+        else
+            return new  ResponseEntity<>("Не удалось учесть расход", HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({
             ConstraintViolationException.class,
             MethodArgumentTypeMismatchException.class,
-            MethodArgumentNotValidException.class
+            MethodArgumentNotValidException.class,
+            HttpMessageNotReadableException.class
     })
     public ResponseEntity<Object> handleValidateException(Exception exc) {
         return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({HttpServerErrorException.InternalServerError.class})
+    @ExceptionHandler({
+            HttpServerErrorException.class,
+    })
     public ResponseEntity<Object> handleInternalServerException(Exception exc) {
         return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }

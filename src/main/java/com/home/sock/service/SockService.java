@@ -23,22 +23,22 @@ public class SockService {
 
     public Color findColorOrSave(String color) {
         color = color.trim();
-        Optional<Color> colorToDb =this.colorRepository.findOneByColor(color);
-        if(colorToDb.isEmpty())
+        Optional<Color> colorToDb = this.colorRepository.findOneByColor(color);
+        if (colorToDb.isEmpty())
             return this.colorRepository.save(new Color(color));
         else return colorToDb.get();
     }
 
     public CottonPart findCottonPartOrSave(int cottonPart) {
         Optional<CottonPart> cpToDb = this.cottonPartRepository.findOneByCottonPart(cottonPart);
-        if(cpToDb.isEmpty())
+        if (cpToDb.isEmpty())
             return this.cottonPartRepository.save(new CottonPart(cottonPart));
         else return cpToDb.get();
     }
 
     public boolean income(SocksIncomeOutcomeDto dto) {
         Optional<Sock> Sock;
-        Optional<Color>  color =this.colorRepository.findOneByColor(dto.getColor());
+        Optional<Color> color = this.colorRepository.findOneByColor(dto.getColor());
         Optional<CottonPart> cottonPart = this.cottonPartRepository.findOneByCottonPart(dto.getCottonPart());
         if (color.isPresent() && cottonPart.isPresent()) {
             Sock = this.sockRepository.findOneByColorAndCottonPart(color.get(), cottonPart.get());
@@ -58,13 +58,13 @@ public class SockService {
     public void saveNewPosition(SocksIncomeOutcomeDto dto) {
         Color color = findColorOrSave(dto.getColor());
         CottonPart cottonPart = findCottonPartOrSave(dto.getCottonPart());
-        Sock Sock = new Sock(color,dto.getQuantity(),cottonPart);
+        Sock Sock = new Sock(color, dto.getQuantity(), cottonPart);
         this.sockRepository.save(Sock);
     }
 
     public boolean outcome(SocksIncomeOutcomeDto dto) {
         Optional<Sock> Sock;
-        Optional<Color>  color =this.colorRepository.findOneByColor(dto.getColor());
+        Optional<Color> color = this.colorRepository.findOneByColor(dto.getColor());
         Optional<CottonPart> cottonPart = this.cottonPartRepository.findOneByCottonPart(dto.getCottonPart());
         if (color.isPresent() && cottonPart.isPresent()) {
             Sock = this.sockRepository.findOneByColorAndCottonPart(color.get(), cottonPart.get());
