@@ -29,10 +29,6 @@ public class SockController {
 
     @Autowired
     SockRepository sockRepository;
-    @Autowired
-    CottonPartRepository cottonPartRepository;
-    @Autowired
-    ColorRepository colorRepository;
 
     final SockService sockService;
     @Autowired
