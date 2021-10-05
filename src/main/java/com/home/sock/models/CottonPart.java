@@ -1,4 +1,4 @@
-package com.models;
+package com.home.sock.models;
 
 import javax.persistence.*;
 import java.util.Set;

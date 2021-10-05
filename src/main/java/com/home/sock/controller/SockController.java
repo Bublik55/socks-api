@@ -1,10 +1,8 @@
-package com.controller;
+package com.home.sock.controller;
 
-import com.service.SockService;
-import com.dto.SocksIncomeOutcomeDto;
-import com.repository.ColorRepository;
-import com.repository.CottonPartRepository;
-import com.repository.SockRepository;
+import com.home.sock.dto.SocksIncomeOutcomeDto;
+import com.home.sock.repository.SockRepository;
+import com.home.sock.service.SockService;
 
 
 import javax.validation.ConstraintViolationException;

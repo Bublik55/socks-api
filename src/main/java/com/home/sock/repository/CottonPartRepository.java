@@ -1,6 +1,6 @@
-package com.repository;
+package com.home.sock.repository;
 
-import com.models.CottonPart;
+import com.home.sock.models.CottonPart;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -1,8 +1,8 @@
-package com.repository;
+package com.home.sock.repository;
 
-import com.models.Color;
-import com.models.CottonPart;
-import com.models.Sock;
+import com.home.sock.models.Color;
+import com.home.sock.models.CottonPart;
+import com.home.sock.models.Sock;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

@@ -1,4 +1,4 @@
-package com.dto;
+package com.home.sock.dto;
 import lombok.Data;
 
 import javax.validation.constraints.*;

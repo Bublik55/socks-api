@@ -1,12 +1,12 @@
-package com.service;
+package com.home.sock.service;
 
-import com.dto.SocksIncomeOutcomeDto;
-import com.models.Color;
-import com.models.CottonPart;
-import com.models.Sock;
-import com.repository.ColorRepository;
-import com.repository.CottonPartRepository;
-import com.repository.SockRepository;
+import com.home.sock.dto.SocksIncomeOutcomeDto;
+import com.home.sock.repository.SockRepository;
+import com.home.sock.models.Color;
+import com.home.sock.models.CottonPart;
+import com.home.sock.models.Sock;
+import com.home.sock.repository.ColorRepository;
+import com.home.sock.repository.CottonPartRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
