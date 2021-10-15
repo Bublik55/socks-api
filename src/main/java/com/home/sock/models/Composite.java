@@ -15,7 +15,7 @@ public class Composite {
     @Column(name = "cotton_part")
     private int cottonPart;
 
-    @OneToMany(mappedBy = "Composite", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "composite", cascade = CascadeType.ALL)
     private Set<Sock> socks;
     public long getId() {
         return id;
